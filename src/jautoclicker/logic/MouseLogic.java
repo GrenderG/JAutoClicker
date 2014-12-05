@@ -5,15 +5,11 @@
  */
 package jautoclicker.logic;
 
-import java.awt.MouseInfo;
-import java.awt.Point;
+import jautoclicker.visual.Main;
 import java.awt.Robot;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.Timer;
 
 /**
  *
@@ -27,27 +23,36 @@ public class MouseLogic implements Runnable {
     private long maxTime;
     boolean isDelayed;
     boolean isInfinite;
+    boolean haveMaxClicks;
     private double[] coords;
+    private Main context;
     
-    public MouseLogic(double[] coords, int delay, long maxTemp, long maxClicks, boolean isDelayed, boolean isInfinite) {
+    public MouseLogic(double[] coords, int delay, long maxTemp, long maxClicks, boolean isDelayed, boolean isInfinite, boolean haveMaxClicks, Main context) {
         this.coords = coords;
-        this.maxClicks = maxClicks;
         this.timeNow = System.currentTimeMillis();
+        this.isInfinite = isInfinite;
+        this.isDelayed = isDelayed;
+        this.haveMaxClicks = haveMaxClicks;
+        this.context = context;
+        
         if (isDelayed) {
             this.delay = delay;
-            this.isDelayed = isDelayed;
         }
         if (!isInfinite) {
             this.maxTime = maxTemp;
-            this.isInfinite = isInfinite;
+        }
+        
+        if (haveMaxClicks){
+            this.maxClicks = maxClicks;
         }
     }
 
     @Override
     public void run() {
         long actualTime = System.currentTimeMillis();
-
-        if (isDelayed && !isInfinite) {
+        long clickCount = 0;
+        
+        if (isDelayed && !isInfinite && !haveMaxClicks) {
 
             while (actualTime < timeNow + maxTime) {
                 try {
@@ -59,11 +64,12 @@ public class MouseLogic implements Runnable {
                 }
             }
 
-        } else if (isInfinite && !isDelayed) {
+        } else if (isInfinite && !isDelayed && !haveMaxClicks) {
             while (true) {
                 startClicking();
             }
-        } else if (isInfinite && isDelayed) {
+            
+        } else if (isInfinite && isDelayed && !haveMaxClicks) {
             while (true) {
                 try {
                     startClicking();
@@ -73,7 +79,48 @@ public class MouseLogic implements Runnable {
                     Logger.getLogger(MouseLogic.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+        } else if (isDelayed && !isInfinite && haveMaxClicks) {
+
+            while (actualTime < timeNow + maxTime && clickCount < maxClicks) {
+                try {
+                    startClicking();
+                    clickCount++;
+                    context.setTitleInfo(clickCount);
+                    Thread.sleep(delay);
+                    actualTime += delay;
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(MouseLogic.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+        } else if (isInfinite && !isDelayed && haveMaxClicks) {
+            while (true) {
+                startClicking();               
+                clickCount++;
+                context.setTitleInfo(clickCount);
+                System.out.println(clickCount);
+                if (clickCount == maxClicks)
+                    break;
+            }
+            
+        } else if (isInfinite && isDelayed && haveMaxClicks) {
+            while (true) {
+                try {
+                    startClicking();
+                    clickCount++;
+                    context.setTitleInfo(clickCount);
+                    Thread.sleep(delay);
+                    actualTime += delay;
+                    
+                    if (clickCount == maxClicks)
+                        break;
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(MouseLogic.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         }
+        
+
     }
 
     public void startClicking() {
