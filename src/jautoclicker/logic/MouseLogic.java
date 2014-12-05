@@ -52,13 +52,18 @@ public class MouseLogic implements Runnable {
         long actualTime = System.currentTimeMillis();
         long clickCount = 0;
         
-        if (isDelayed && !isInfinite && !haveMaxClicks) {
+        if (isDelayed && !isInfinite && !haveMaxClicks ||
+                !isDelayed && !isInfinite && !haveMaxClicks) {
 
             while (actualTime < timeNow + maxTime) {
                 try {
                     startClicking();
-                    Thread.sleep(delay);
-                    actualTime += delay;
+                    clickCount++;
+                    context.setTitleInfo(clickCount);
+                    if (isDelayed)
+                        Thread.sleep(delay);
+                    
+                    actualTime += delay;  
                 } catch (InterruptedException ex) {
                     Logger.getLogger(MouseLogic.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -67,26 +72,32 @@ public class MouseLogic implements Runnable {
         } else if (isInfinite && !isDelayed && !haveMaxClicks) {
             while (true) {
                 startClicking();
+                clickCount++;
+                context.setTitleInfo(clickCount);
             }
             
         } else if (isInfinite && isDelayed && !haveMaxClicks) {
             while (true) {
                 try {
                     startClicking();
+                    clickCount++;
+                    context.setTitleInfo(clickCount);
                     Thread.sleep(delay);
                     actualTime += delay;                   
                 } catch (InterruptedException ex) {
                     Logger.getLogger(MouseLogic.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-        } else if (isDelayed && !isInfinite && haveMaxClicks) {
+        } else if (isDelayed && !isInfinite && haveMaxClicks ||
+                !isInfinite && !isDelayed && haveMaxClicks) {
 
             while (actualTime < timeNow + maxTime && clickCount < maxClicks) {
                 try {
                     startClicking();
                     clickCount++;
                     context.setTitleInfo(clickCount);
-                    Thread.sleep(delay);
+                    if (isDelayed)
+                        Thread.sleep(delay);
                     actualTime += delay;
                 } catch (InterruptedException ex) {
                     Logger.getLogger(MouseLogic.class.getName()).log(Level.SEVERE, null, ex);
@@ -120,7 +131,6 @@ public class MouseLogic implements Runnable {
             }
         }
         
-
     }
 
     public void startClicking() {

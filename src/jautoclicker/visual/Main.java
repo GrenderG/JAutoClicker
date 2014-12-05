@@ -51,6 +51,9 @@ public class Main extends javax.swing.JFrame {
         this.comoBoxTiempoMax.addItem("300 min");
 
         this.comoBoxIntervalo.addItem("Indefinido");
+        this.comoBoxIntervalo.addItem("0.01 s");
+        this.comoBoxIntervalo.addItem("0.05 s");
+        this.comoBoxIntervalo.addItem("0.1 s");
         this.comoBoxIntervalo.addItem("0.5 s");
         this.comoBoxIntervalo.addItem("1 s");
         this.comoBoxIntervalo.addItem("5 s");
@@ -151,36 +154,45 @@ public class Main extends javax.swing.JFrame {
                         isDelayed = false;
                         break;
                     case 1:
-                        delay = 500;
-                        break;
+                        delay = 10;
+                        break;    
                     case 2:
-                        delay = 1000;
-                        break;
+                        delay = 50;
+                        break;    
                     case 3:
-                        delay = 5000;
+                        delay = 100;
                         break;
                     case 4:
-                        delay = 10000;
+                        delay = 500;
                         break;
                     case 5:
-                        delay = 30000;
+                        delay = 1000;
                         break;
                     case 6:
-                        delay = 60000;
+                        delay = 5000;
                         break;
                     case 7:
-                        delay = 90000;
+                        delay = 10000;
                         break;
                     case 8:
-                        delay = 120000;
+                        delay = 30000;
                         break;
                     case 9:
-                        delay = 180000;
+                        delay = 60000;
                         break;
                     case 10:
-                        delay = 300000;
+                        delay = 90000;
                         break;
                     case 11:
+                        delay = 120000;
+                        break;
+                    case 12:
+                        delay = 180000;
+                        break;
+                    case 13:
+                        delay = 300000;
+                        break;
+                    case 14:
                         delay = 900000;
                         break;    
                 }
@@ -199,7 +211,7 @@ public class Main extends javax.swing.JFrame {
                         maxClicks = 30;
                         break;
                     case 4:
-                        maxClicks = 500;
+                        maxClicks = 100;
                         break;    
                     case 5:
                         maxClicks = 500;
@@ -299,6 +311,7 @@ public class Main extends javax.swing.JFrame {
         comoBoxTiempoMax.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         comoBoxIntervalo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comoBoxIntervalo.setToolTipText("Si eliges \"Indefinido\" junto con un número máximo de clics, quizá no alcance los clics deseados.");
 
         comoBoxClicMax.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 

@@ -149,6 +149,7 @@
                 <StringItem index="3" value="Item 4"/>
               </StringArray>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Si eliges &quot;Indefinido&quot; junto con un n&#xfa;mero m&#xe1;ximo de clics, quiz&#xe1; no alcance los clics deseados."/>
           </Properties>
         </Component>
         <Component class="javax.swing.JComboBox" name="comoBoxClicMax">
