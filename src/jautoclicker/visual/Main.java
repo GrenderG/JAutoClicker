@@ -6,13 +6,18 @@
 package jautoclicker.visual;
 
 import jautoclicker.logic.MouseLogic;
+import jautoclicker.logic.Timer;
+import java.applet.Applet;
+import java.applet.AudioClip;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -22,7 +27,15 @@ public class Main extends javax.swing.JFrame {
 
     private double coords[] = new double[2];
     private MouseLogic ml;
+    private Timer timer;
     private static final ImageIcon icon = new ImageIcon(Main.class.getResource("/res/icon.png"));
+    
+    private final URL soundPath[] = new URL[]{Main.class.getResource("/sounds/1.wav"), 
+                                        Main.class.getResource("/sounds/2.wav"),
+                                        Main.class.getResource("/sounds/3.wav"), 
+                                        Main.class.getResource("/sounds/4.wav"), 
+                                        Main.class.getResource("/sounds/5.wav")};
+
     /**
      * Creates new form Main
      */
@@ -33,67 +46,80 @@ public class Main extends javax.swing.JFrame {
         
         this.setLocationRelativeTo(null);
 
-        this.comoBoxTiempoMax.removeAllItems();
-        this.comoBoxIntervalo.removeAllItems();
-        this.comoBoxClicMax.removeAllItems();
+        this.comboBoxMaxTime.removeAllItems();
+        this.comboBoxInterval.removeAllItems();
+        this.comboBoxMaxClick.removeAllItems();
+        this.comboBoxButtonToPress.removeAllItems();
+        
+        this.btnStart.setEnabled(false);
 
-        this.comoBoxTiempoMax.addItem("Infinito");
-        this.comoBoxTiempoMax.addItem("1 min");
-        this.comoBoxTiempoMax.addItem("5 min");
-        this.comoBoxTiempoMax.addItem("10 min");
-        this.comoBoxTiempoMax.addItem("15 min");
-        this.comoBoxTiempoMax.addItem("30 min");
-        this.comoBoxTiempoMax.addItem("45 min");
-        this.comoBoxTiempoMax.addItem("60 min");
-        this.comoBoxTiempoMax.addItem("90 min");
-        this.comoBoxTiempoMax.addItem("120 min");
-        this.comoBoxTiempoMax.addItem("180 min");
-        this.comoBoxTiempoMax.addItem("300 min");
+        this.comboBoxMaxTime.addItem("Infinite");
+        this.comboBoxMaxTime.addItem("1 min");
+        this.comboBoxMaxTime.addItem("5 min");
+        this.comboBoxMaxTime.addItem("10 min");
+        this.comboBoxMaxTime.addItem("15 min");
+        this.comboBoxMaxTime.addItem("30 min");
+        this.comboBoxMaxTime.addItem("45 min");
+        this.comboBoxMaxTime.addItem("60 min");
+        this.comboBoxMaxTime.addItem("90 min");
+        this.comboBoxMaxTime.addItem("120 min");
+        this.comboBoxMaxTime.addItem("180 min");
+        this.comboBoxMaxTime.addItem("300 min");
 
-        this.comoBoxIntervalo.addItem("Indefinido");
-        this.comoBoxIntervalo.addItem("0.01 s");
-        this.comoBoxIntervalo.addItem("0.05 s");
-        this.comoBoxIntervalo.addItem("0.1 s");
-        this.comoBoxIntervalo.addItem("0.5 s");
-        this.comoBoxIntervalo.addItem("1 s");
-        this.comoBoxIntervalo.addItem("5 s");
-        this.comoBoxIntervalo.addItem("10 s");
-        this.comoBoxIntervalo.addItem("30 s");
-        this.comoBoxIntervalo.addItem("60 s");
-        this.comoBoxIntervalo.addItem("90 s");
-        this.comoBoxIntervalo.addItem("120 s");
-        this.comoBoxIntervalo.addItem("180 s");
-        this.comoBoxIntervalo.addItem("300 s");
-        this.comoBoxIntervalo.addItem("900 s");
+        this.comboBoxInterval.addItem("Undefined");
+        this.comboBoxInterval.addItem("0.01 s");
+        this.comboBoxInterval.addItem("0.05 s");
+        this.comboBoxInterval.addItem("0.1 s");
+        this.comboBoxInterval.addItem("0.5 s");
+        this.comboBoxInterval.addItem("1 s");
+        this.comboBoxInterval.addItem("5 s");
+        this.comboBoxInterval.addItem("10 s");
+        this.comboBoxInterval.addItem("30 s");
+        this.comboBoxInterval.addItem("60 s");
+        this.comboBoxInterval.addItem("90 s");
+        this.comboBoxInterval.addItem("120 s");
+        this.comboBoxInterval.addItem("180 s");
+        this.comboBoxInterval.addItem("300 s");
+        this.comboBoxInterval.addItem("900 s");
 
-        this.comoBoxClicMax.addItem("Infinito");
-        this.comoBoxClicMax.addItem("5 clics");
-        this.comoBoxClicMax.addItem("10 clics");
-        this.comoBoxClicMax.addItem("30 clics");
-        this.comoBoxClicMax.addItem("100 clics");
-        this.comoBoxClicMax.addItem("500 clics");
-        this.comoBoxClicMax.addItem("1000 clics");
-        this.comoBoxClicMax.addItem("2500 clics");
-        this.comoBoxClicMax.addItem("5000 clics");
-        this.comoBoxClicMax.addItem("10000 clics");
-        this.comoBoxClicMax.addItem("250000 clics");
-        this.comoBoxClicMax.addItem("500000 clics");
-        this.comoBoxClicMax.addItem("750000 clics");
-        this.comoBoxClicMax.addItem("1000000 clics");
+        this.comboBoxMaxClick.addItem("Infinite");
+        this.comboBoxMaxClick.addItem("5 clicks");
+        this.comboBoxMaxClick.addItem("10 clicks");
+        this.comboBoxMaxClick.addItem("30 clicks");
+        this.comboBoxMaxClick.addItem("100 clicks");
+        this.comboBoxMaxClick.addItem("500 clicks");
+        this.comboBoxMaxClick.addItem("1000 clicks");
+        this.comboBoxMaxClick.addItem("2500 clicks");
+        this.comboBoxMaxClick.addItem("5000 clicks");
+        this.comboBoxMaxClick.addItem("10000 clicks");
+        this.comboBoxMaxClick.addItem("250000 clicks");
+        this.comboBoxMaxClick.addItem("500000 clicks");
+        this.comboBoxMaxClick.addItem("750000 clicks");
+        this.comboBoxMaxClick.addItem("1000000 clicks");
+        
+        this.comboBoxButtonToPress.addItem("Left button");
+        this.comboBoxButtonToPress.addItem("Wheel button");
+        this.comboBoxButtonToPress.addItem("Right button");
+        
+        this.infoCalibrar.setText("Press the button to get coords. Once is pressed, "
+                + "keep the pointer in the place you want to do the "
+                + "automatic clicks and wait for 5 seconds.");
 
-        this.infoCalibrar.setText("Pulsa el botón para calibrar. Una vez pulsado "
-                + "deja el cursor en el lugar de la pantalla donde realizar los clics "
-                + "automáticos y espera durante 5 segundos.");
-
-        this.btnCalibrar.addActionListener(new ActionListener() {
+        this.btnCalibrate.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
 
                 try {
-                    Thread.sleep(5000);
-                    Main.this.setCoords();
+                    
+                    for (int i = 0; i < 5; i++){
+                        Applet.newAudioClip(soundPath[i]).play();
+                        Thread.sleep(1000);
+                    }
+                    
+                    Main.this.coords = Main.this.getCoords();
                     setCoordsText();
+                    Main.this.setStartEnabled(true);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -102,15 +128,15 @@ public class Main extends javax.swing.JFrame {
 
         });
 
-        this.btnComenzar.addActionListener(new ActionListener() {
+        this.btnStart.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                int delay = 0;
+                int delay = 0, whichButton = 0;
                 boolean isDelayed = true, isInfinite = false, haveMaxClicks = true;
                 long timeMax = 0, maxClicks = 0;
                 
-                switch(Main.this.comoBoxTiempoMax.getSelectedIndex()){
+                switch(Main.this.comboBoxMaxTime.getSelectedIndex()){
                     case 0:
                         isInfinite = true;
                         break;
@@ -149,7 +175,7 @@ public class Main extends javax.swing.JFrame {
                         break;    
                 }
                 
-                switch(Main.this.comoBoxIntervalo.getSelectedIndex()){
+                switch(Main.this.comboBoxInterval.getSelectedIndex()){
                     case 0:
                         isDelayed = false;
                         break;
@@ -197,7 +223,7 @@ public class Main extends javax.swing.JFrame {
                         break;    
                 }
                 
-                switch(Main.this.comoBoxClicMax.getSelectedIndex()){
+                switch(Main.this.comboBoxMaxClick.getSelectedIndex()){
                     case 0:
                         haveMaxClicks = false;
                         break;
@@ -241,9 +267,28 @@ public class Main extends javax.swing.JFrame {
                         maxClicks = 1000000;
                         break;     
                 }
-
-                ml = new MouseLogic(Main.this.coords, delay, timeMax, maxClicks, isDelayed, isInfinite, haveMaxClicks, Main.this);
+                
+                switch(Main.this.comboBoxButtonToPress.getSelectedIndex()){
+                    case 0:
+                        whichButton = 0;
+                        break;
+                    case 1:
+                        whichButton = 1;
+                        break;
+                    case 2:
+                        whichButton = 2;
+                        break;
+                }
+                
+                timer = new Timer(Main.this);
+                Thread tTimer = new Thread(timer);
+                
+                ml = new MouseLogic(Main.this.coords, whichButton, delay, timeMax, maxClicks, isDelayed, isInfinite, haveMaxClicks, Main.this, Main.this.timer);
                 Thread clicker = new Thread(ml);
+                
+                Main.this.setCalibrateEnabled(false);
+                Main.this.setStartEnabled(false);
+                tTimer.start();
                 clicker.start();
                 
             }
@@ -251,23 +296,33 @@ public class Main extends javax.swing.JFrame {
         });
 
     }
-
-    public void setCoordsText() {
-        this.labelCoord.setText("x: " + this.coords[0] + ", y: " + this.coords[1]);
+    
+    public Timer getTimer(){
+        return this.timer;
     }
     
-    public void setTitleInfo(long clickCount){
-        
-        this.setTitle("JAutoClicker | Clics: "+clickCount);
+    public void setCalibrateEnabled(boolean isEnabled){
+        this.btnCalibrate.setEnabled(isEnabled);
     }
     
-    public void setCoords() {
+    public void setStartEnabled(boolean isEnabled){
+        this.btnStart.setEnabled(isEnabled);
+    }
+    
+    public double[] getCoords() {
 
         Point p = MouseInfo.getPointerInfo().getLocation();
 
-        this.coords[0] = (double) p.x;
-        this.coords[1] = (double) p.y;
+        return (new double[]{p.x, p.y});
 
+    }
+    
+    public void showFinishDialog(){
+        JOptionPane.showMessageDialog(null, "La operación ha terminado.", "JAutoClicker", JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    public void setCoordsText() {
+        this.labelCoord.setText("x: " + this.coords[0] + ", y: " + this.coords[1]);
     }
 
     /**
@@ -280,19 +335,21 @@ public class Main extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        labelTiempoMax = new javax.swing.JLabel();
-        labelIntervalo = new javax.swing.JLabel();
-        labelClicMax = new javax.swing.JLabel();
-        comoBoxTiempoMax = new javax.swing.JComboBox();
-        comoBoxIntervalo = new javax.swing.JComboBox();
-        comoBoxClicMax = new javax.swing.JComboBox();
-        btnCalibrar = new javax.swing.JButton();
+        labelMaxTime = new javax.swing.JLabel();
+        labelInterval = new javax.swing.JLabel();
+        labelMaxClick = new javax.swing.JLabel();
+        comboBoxMaxTime = new javax.swing.JComboBox();
+        comboBoxInterval = new javax.swing.JComboBox();
+        comboBoxMaxClick = new javax.swing.JComboBox();
+        btnCalibrate = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         infoCalibrar = new javax.swing.JTextPane();
+        labelButtonToPress = new javax.swing.JLabel();
+        comboBoxButtonToPress = new javax.swing.JComboBox();
         jPanel2 = new javax.swing.JPanel();
         labelCoordInfo = new javax.swing.JLabel();
         labelCoord = new javax.swing.JLabel();
-        btnComenzar = new javax.swing.JButton();
+        btnStart = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("JAutoClicker");
@@ -302,47 +359,59 @@ public class Main extends javax.swing.JFrame {
         jPanel1.setBackground(new java.awt.Color(204, 204, 204));
         jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
-        labelTiempoMax.setText("Tiempo máximo");
+        labelMaxTime.setText("Max. time");
 
-        labelIntervalo.setText("Intervalo entre clics");
+        labelInterval.setText("Click interval");
 
-        labelClicMax.setText("Número máximo de clics");
+        labelMaxClick.setText("Max. number of clicks");
 
-        comoBoxTiempoMax.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboBoxMaxTime.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboBoxMaxTime.setPreferredSize(new java.awt.Dimension(120, 24));
 
-        comoBoxIntervalo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        comoBoxIntervalo.setToolTipText("Si eliges \"Indefinido\" junto con un número máximo de clics, quizá no alcance los clics deseados.");
+        comboBoxInterval.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboBoxInterval.setToolTipText("\"Undefined\" may cause weird behaviours, be careful.");
+        comboBoxInterval.setPreferredSize(new java.awt.Dimension(120, 24));
 
-        comoBoxClicMax.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboBoxMaxClick.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboBoxMaxClick.setPreferredSize(new java.awt.Dimension(120, 24));
 
-        btnCalibrar.setText("Calibrar");
+        btnCalibrate.setText("Calibrate");
 
         infoCalibrar.setEditable(false);
         infoCalibrar.setBackground(new java.awt.Color(204, 204, 204));
         infoCalibrar.setEnabled(false);
         jScrollPane2.setViewportView(infoCalibrar);
 
+        labelButtonToPress.setText("Button to press");
+
+        comboBoxButtonToPress.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboBoxButtonToPress.setPreferredSize(new java.awt.Dimension(120, 24));
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane2)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(labelIntervalo, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
-                            .addComponent(labelTiempoMax, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(labelInterval, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                            .addComponent(labelMaxTime, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(comoBoxTiempoMax, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(comoBoxIntervalo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(labelClicMax)
+                            .addComponent(comboBoxMaxTime, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(comboBoxInterval, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(labelMaxClick)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(comoBoxClicMax, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(btnCalibrar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(comboBoxMaxClick, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnCalibrate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(labelButtonToPress)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(comboBoxButtonToPress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -350,29 +419,33 @@ public class Main extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelTiempoMax)
-                    .addComponent(comoBoxTiempoMax, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(labelMaxTime)
+                    .addComponent(comboBoxMaxTime, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(21, 21, 21)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelIntervalo)
-                    .addComponent(comoBoxIntervalo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(comboBoxInterval, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(labelInterval))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelClicMax)
-                    .addComponent(comoBoxClicMax, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
+                    .addComponent(labelMaxClick)
+                    .addComponent(comboBoxMaxClick, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(labelButtonToPress)
+                    .addComponent(comboBoxButtonToPress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnCalibrar)
+                .addComponent(btnCalibrate)
                 .addContainerGap())
         );
 
         jPanel2.setBackground(new java.awt.Color(204, 204, 204));
         jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
-        labelCoordInfo.setText("Establecer auto clic en coordenadas: ");
+        labelCoordInfo.setText("Do auto-clicks in: ");
 
-        btnComenzar.setText("Comenzar");
+        btnStart.setText("Start");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -381,11 +454,11 @@ public class Main extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnComenzar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnStart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(labelCoordInfo)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(labelCoord, javax.swing.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)))
+                        .addComponent(labelCoord, javax.swing.GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -396,7 +469,7 @@ public class Main extends javax.swing.JFrame {
                     .addComponent(labelCoordInfo)
                     .addComponent(labelCoord))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnComenzar)
+                .addComponent(btnStart)
                 .addContainerGap(17, Short.MAX_VALUE))
         );
 
@@ -410,7 +483,7 @@ public class Main extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -454,19 +527,21 @@ public class Main extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnCalibrar;
-    private javax.swing.JButton btnComenzar;
-    private javax.swing.JComboBox comoBoxClicMax;
-    private javax.swing.JComboBox comoBoxIntervalo;
-    private javax.swing.JComboBox comoBoxTiempoMax;
+    private javax.swing.JButton btnCalibrate;
+    private javax.swing.JButton btnStart;
+    private javax.swing.JComboBox comboBoxButtonToPress;
+    private javax.swing.JComboBox comboBoxInterval;
+    private javax.swing.JComboBox comboBoxMaxClick;
+    private javax.swing.JComboBox comboBoxMaxTime;
     private javax.swing.JTextPane infoCalibrar;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JLabel labelClicMax;
+    private javax.swing.JLabel labelButtonToPress;
     private javax.swing.JLabel labelCoord;
     private javax.swing.JLabel labelCoordInfo;
-    private javax.swing.JLabel labelIntervalo;
-    private javax.swing.JLabel labelTiempoMax;
+    private javax.swing.JLabel labelInterval;
+    private javax.swing.JLabel labelMaxClick;
+    private javax.swing.JLabel labelMaxTime;
     // End of variables declaration//GEN-END:variables
 }

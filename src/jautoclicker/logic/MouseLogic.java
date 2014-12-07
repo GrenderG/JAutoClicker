@@ -6,6 +6,8 @@
 package jautoclicker.logic;
 
 import jautoclicker.visual.Main;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.Robot;
 import java.awt.event.InputEvent;
 import java.util.logging.Level;
@@ -26,44 +28,55 @@ public class MouseLogic implements Runnable {
     boolean haveMaxClicks;
     private double[] coords;
     private Main context;
+    private int whichButton;
+    private long clickCount = 0;
+    private Timer timer;
     
-    public MouseLogic(double[] coords, int delay, long maxTemp, long maxClicks, boolean isDelayed, boolean isInfinite, boolean haveMaxClicks, Main context) {
+    public MouseLogic(double[] coords, int whichButton, int delay, long maxTemp, long maxClicks, boolean isDelayed, boolean isInfinite, boolean haveMaxClicks, Main context, Timer timer) {
+        this.whichButton = whichButton;
         this.coords = coords;
         this.timeNow = System.currentTimeMillis();
         this.isInfinite = isInfinite;
         this.isDelayed = isDelayed;
         this.haveMaxClicks = haveMaxClicks;
         this.context = context;
-        
+        this.timer = timer;
+
         if (isDelayed) {
             this.delay = delay;
         }
         if (!isInfinite) {
             this.maxTime = maxTemp;
         }
-        
-        if (haveMaxClicks){
+
+        if (haveMaxClicks) {
             this.maxClicks = maxClicks;
         }
     }
-
+    
+    public MouseLogic(){
+        
+    }
+    
     @Override
     public void run() {
         long actualTime = System.currentTimeMillis();
-        long clickCount = 0;
-        
-        if (isDelayed && !isInfinite && !haveMaxClicks ||
-                !isDelayed && !isInfinite && !haveMaxClicks) {
+
+        if (isDelayed && !isInfinite && !haveMaxClicks
+                || !isDelayed && !isInfinite && !haveMaxClicks) {
 
             while (actualTime < timeNow + maxTime) {
                 try {
                     startClicking();
                     clickCount++;
-                    context.setTitleInfo(clickCount);
-                    if (isDelayed)
+                    this.setTitleTimer();
+                    if (isDelayed) {
                         Thread.sleep(delay);
-                    
-                    actualTime += delay;  
+                        actualTime += delay;
+                    } else {
+                        actualTime = System.currentTimeMillis();
+                    }
+
                 } catch (InterruptedException ex) {
                     Logger.getLogger(MouseLogic.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -73,31 +86,32 @@ public class MouseLogic implements Runnable {
             while (true) {
                 startClicking();
                 clickCount++;
-                context.setTitleInfo(clickCount);
+                this.setTitleTimer();
             }
-            
+
         } else if (isInfinite && isDelayed && !haveMaxClicks) {
             while (true) {
                 try {
                     startClicking();
                     clickCount++;
-                    context.setTitleInfo(clickCount);
+                    this.setTitleTimer();
                     Thread.sleep(delay);
-                    actualTime += delay;                   
+                    actualTime += delay;
                 } catch (InterruptedException ex) {
                     Logger.getLogger(MouseLogic.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-        } else if (isDelayed && !isInfinite && haveMaxClicks ||
-                !isInfinite && !isDelayed && haveMaxClicks) {
+        } else if (isDelayed && !isInfinite && haveMaxClicks
+                || !isInfinite && !isDelayed && haveMaxClicks) {
 
             while (actualTime < timeNow + maxTime && clickCount < maxClicks) {
                 try {
                     startClicking();
                     clickCount++;
-                    context.setTitleInfo(clickCount);
-                    if (isDelayed)
+                    this.setTitleTimer();
+                    if (isDelayed) {
                         Thread.sleep(delay);
+                    }
                     actualTime += delay;
                 } catch (InterruptedException ex) {
                     Logger.getLogger(MouseLogic.class.getName()).log(Level.SEVERE, null, ex);
@@ -106,46 +120,70 @@ public class MouseLogic implements Runnable {
 
         } else if (isInfinite && !isDelayed && haveMaxClicks) {
             while (true) {
-                startClicking();               
+                startClicking();
                 clickCount++;
-                context.setTitleInfo(clickCount);
-                System.out.println(clickCount);
-                if (clickCount == maxClicks)
+                this.setTitleTimer();
+                if (clickCount == maxClicks) {
                     break;
+                }
             }
-            
+
         } else if (isInfinite && isDelayed && haveMaxClicks) {
             while (true) {
                 try {
                     startClicking();
                     clickCount++;
-                    context.setTitleInfo(clickCount);
                     Thread.sleep(delay);
                     actualTime += delay;
-                    
-                    if (clickCount == maxClicks)
+                    this.setTitleTimer();
+                    if (clickCount == maxClicks) {
                         break;
+                    }
                 } catch (InterruptedException ex) {
                     Logger.getLogger(MouseLogic.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
         
+        context.getTimer().stopTimer();
+        context.setCalibrateEnabled(true);
+        context.setStartEnabled(true);
+        context.showFinishDialog();
+        
     }
-
+    
+    public long getClickCount(){
+        return this.clickCount;
+    }
+    
+    public void setCoords(double[] coords){
+        this.coords[0] = coords[0];
+        this.coords[1] = coords[1];
+    }
+    
+    public void setTitleTimer(){
+        context.setTitle("JAutoClicker | Clicks: "+getClickCount()+" | ~"+timer.getTime()+" s");
+    }
+    
     public void startClicking() {
-            try {
+        try {
 
-                Robot bot = new Robot();
+            Robot bot = new Robot();
+            int mask;
+            
+            if (whichButton == 0)
+                mask = InputEvent.BUTTON1_DOWN_MASK;
+            else if (whichButton == 1)
+                mask = InputEvent.BUTTON2_DOWN_MASK;
+            else
+                mask = InputEvent.BUTTON3_DOWN_MASK;
 
-                int mask = InputEvent.BUTTON1_DOWN_MASK;
+            bot.mouseMove((int) coords[0], (int) coords[1]);
+            bot.mousePress(mask);
+            bot.mouseRelease(mask);
 
-                bot.mouseMove((int)coords[0], (int)coords[1]);
-                bot.mousePress(mask);
-                bot.mouseRelease(mask);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
