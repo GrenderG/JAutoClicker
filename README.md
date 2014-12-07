@@ -1,4 +1,4 @@
-JAutoClicker v0.2
+JAutoClicker v0.3
 ============
 
 Release notes 07/12/2014
