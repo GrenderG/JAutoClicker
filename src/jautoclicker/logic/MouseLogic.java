@@ -31,6 +31,7 @@ public class MouseLogic implements Runnable {
     private int whichButton;
     private long clickCount = 0;
     private Timer timer;
+    private boolean escapePressed = false;
     
     public MouseLogic(double[] coords, int whichButton, int delay, long maxTemp, long maxClicks, boolean isDelayed, boolean isInfinite, boolean haveMaxClicks, Main context, Timer timer) {
         this.whichButton = whichButton;
@@ -41,7 +42,8 @@ public class MouseLogic implements Runnable {
         this.haveMaxClicks = haveMaxClicks;
         this.context = context;
         this.timer = timer;
-
+        this.escapePressed = false;
+        
         if (isDelayed) {
             this.delay = delay;
         }
@@ -65,7 +67,7 @@ public class MouseLogic implements Runnable {
         if (isDelayed && !isInfinite && !haveMaxClicks
                 || !isDelayed && !isInfinite && !haveMaxClicks) {
 
-            while (actualTime < timeNow + maxTime) {
+            while (actualTime < timeNow + maxTime && !escapePressed) {
                 try {
                     startClicking();
                     clickCount++;
@@ -83,14 +85,14 @@ public class MouseLogic implements Runnable {
             }
 
         } else if (isInfinite && !isDelayed && !haveMaxClicks) {
-            while (true) {
+            while (true && !escapePressed) {
                 startClicking();
                 clickCount++;
                 this.setTitleTimer();
             }
 
         } else if (isInfinite && isDelayed && !haveMaxClicks) {
-            while (true) {
+            while (true && !escapePressed) {
                 try {
                     startClicking();
                     clickCount++;
@@ -104,7 +106,7 @@ public class MouseLogic implements Runnable {
         } else if (isDelayed && !isInfinite && haveMaxClicks
                 || !isInfinite && !isDelayed && haveMaxClicks) {
 
-            while (actualTime < timeNow + maxTime && clickCount < maxClicks) {
+            while (actualTime < timeNow + maxTime && clickCount < maxClicks && !escapePressed) {
                 try {
                     startClicking();
                     clickCount++;
@@ -119,7 +121,7 @@ public class MouseLogic implements Runnable {
             }
 
         } else if (isInfinite && !isDelayed && haveMaxClicks) {
-            while (true) {
+            while (true && !escapePressed) {
                 startClicking();
                 clickCount++;
                 this.setTitleTimer();
@@ -129,7 +131,7 @@ public class MouseLogic implements Runnable {
             }
 
         } else if (isInfinite && isDelayed && haveMaxClicks) {
-            while (true) {
+            while (true && !escapePressed) {
                 try {
                     startClicking();
                     clickCount++;
@@ -150,6 +152,10 @@ public class MouseLogic implements Runnable {
         context.setStartEnabled(true);
         context.showFinishDialog();
         
+    }
+    
+    public void isEscapePressed(boolean isEscapePressed){
+        this.escapePressed = true;
     }
     
     public long getClickCount(){

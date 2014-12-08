@@ -6,6 +6,7 @@
 package jautoclicker.visual;
 
 import jautoclicker.logic.MouseLogic;
+import jautoclicker.logic.StopListener;
 import jautoclicker.logic.Timer;
 import java.applet.Applet;
 import java.applet.AudioClip;
@@ -18,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import org.jnativehook.GlobalScreen;
 
 /**
  *
@@ -25,7 +27,7 @@ import javax.swing.JOptionPane;
  */
 public class Main extends javax.swing.JFrame {
 
-    private double coords[] = new double[2];
+    private double coords[] = new double[]{0.0, 0.0};
     private MouseLogic ml;
     private Timer timer;
     private static final ImageIcon icon = new ImageIcon(Main.class.getResource("/res/icon.png"));
@@ -42,10 +44,18 @@ public class Main extends javax.swing.JFrame {
     public Main() {
         initComponents();
         
+        try{
+            GlobalScreen.registerNativeHook();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        
         this.setIconImage(icon.getImage());
         
         this.setLocationRelativeTo(null);
-
+        
+        this.setCoordsText();
+        
         this.comboBoxMaxTime.removeAllItems();
         this.comboBoxInterval.removeAllItems();
         this.comboBoxMaxClick.removeAllItems();
@@ -101,10 +111,12 @@ public class Main extends javax.swing.JFrame {
         this.comboBoxButtonToPress.addItem("Wheel button");
         this.comboBoxButtonToPress.addItem("Right button");
         
-        this.infoCalibrar.setText("Press the button to get coords. Once is pressed, "
+        this.infoCalibrate.setText("Press the button to get coords. Once is pressed, "
                 + "keep the pointer in the place you want to do the "
                 + "automatic clicks and wait for 5 seconds.");
-
+        
+        this.infoStart.setText("Press ESCAPE to interrupt click action.");
+        
         this.btnCalibrate.addActionListener(new ActionListener() {
 
             @Override
@@ -284,6 +296,7 @@ public class Main extends javax.swing.JFrame {
                 Thread tTimer = new Thread(timer);
                 
                 ml = new MouseLogic(Main.this.coords, whichButton, delay, timeMax, maxClicks, isDelayed, isInfinite, haveMaxClicks, Main.this, Main.this.timer);
+                GlobalScreen.getInstance().addNativeKeyListener(new StopListener(ml));
                 Thread clicker = new Thread(ml);
                 
                 Main.this.setCalibrateEnabled(false);
@@ -295,6 +308,10 @@ public class Main extends javax.swing.JFrame {
 
         });
 
+    }
+    
+    public MouseLogic getMouseLogic(){
+        return this.ml;
     }
     
     public Timer getTimer(){
@@ -343,13 +360,22 @@ public class Main extends javax.swing.JFrame {
         comboBoxMaxClick = new javax.swing.JComboBox();
         btnCalibrate = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        infoCalibrar = new javax.swing.JTextPane();
+        infoCalibrate = new javax.swing.JTextPane();
         labelButtonToPress = new javax.swing.JLabel();
         comboBoxButtonToPress = new javax.swing.JComboBox();
         jPanel2 = new javax.swing.JPanel();
         labelCoordInfo = new javax.swing.JLabel();
         labelCoord = new javax.swing.JLabel();
         btnStart = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        infoStart = new javax.swing.JTextPane();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        itemLaunchAgain = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        itemExit = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("JAutoClicker");
@@ -377,10 +403,10 @@ public class Main extends javax.swing.JFrame {
 
         btnCalibrate.setText("Calibrate");
 
-        infoCalibrar.setEditable(false);
-        infoCalibrar.setBackground(new java.awt.Color(204, 204, 204));
-        infoCalibrar.setEnabled(false);
-        jScrollPane2.setViewportView(infoCalibrar);
+        infoCalibrate.setEditable(false);
+        infoCalibrate.setBackground(new java.awt.Color(240, 240, 240));
+        infoCalibrate.setEnabled(false);
+        jScrollPane2.setViewportView(infoCalibrate);
 
         labelButtonToPress.setText("Button to press");
 
@@ -417,7 +443,7 @@ public class Main extends javax.swing.JFrame {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(11, 11, 11)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(labelMaxTime)
                     .addComponent(comboBoxMaxTime, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -433,11 +459,11 @@ public class Main extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(labelButtonToPress)
                     .addComponent(comboBoxButtonToPress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnCalibrate)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel2.setBackground(new java.awt.Color(204, 204, 204));
@@ -446,6 +472,10 @@ public class Main extends javax.swing.JFrame {
         labelCoordInfo.setText("Do auto-clicks in: ");
 
         btnStart.setText("Start");
+
+        infoStart.setEditable(false);
+        infoStart.setEnabled(false);
+        jScrollPane1.setViewportView(infoStart);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -458,7 +488,8 @@ public class Main extends javax.swing.JFrame {
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(labelCoordInfo)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(labelCoord, javax.swing.GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE)))
+                        .addComponent(labelCoord, javax.swing.GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -470,8 +501,45 @@ public class Main extends javax.swing.JFrame {
                     .addComponent(labelCoord))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnStart)
-                .addContainerGap(17, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        jMenu1.setText("File");
+
+        itemLaunchAgain.setText("Reset to default");
+        itemLaunchAgain.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemLaunchAgainActionPerformed(evt);
+            }
+        });
+        jMenu1.add(itemLaunchAgain);
+        jMenu1.add(jSeparator1);
+
+        itemExit.setText("Exit");
+        itemExit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemExitActionPerformed(evt);
+            }
+        });
+        jMenu1.add(itemExit);
+
+        jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("Help");
+
+        jMenuItem1.setText("Help contents");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem1);
+
+        jMenuBar1.add(jMenu2);
+
+        setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -490,6 +558,26 @@ public class Main extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void itemExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemExitActionPerformed
+        System.exit(0);
+    }//GEN-LAST:event_itemExitActionPerformed
+
+    private void itemLaunchAgainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemLaunchAgainActionPerformed
+        this.comboBoxButtonToPress.setSelectedIndex(0);
+        this.comboBoxInterval.setSelectedIndex(0);
+        this.comboBoxMaxClick.setSelectedIndex(0);
+        this.comboBoxMaxTime.setSelectedIndex(0);
+        this.coords = new double[]{0.0, 0.0};
+        this.btnStart.setEnabled(false);
+        this.btnCalibrate.setEnabled(true);
+        this.setTitle("JAutoClicker");
+        this.setCoordsText();
+    }//GEN-LAST:event_itemLaunchAgainActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        new Help().setVisible(true);
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -533,10 +621,19 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JComboBox comboBoxInterval;
     private javax.swing.JComboBox comboBoxMaxClick;
     private javax.swing.JComboBox comboBoxMaxTime;
-    private javax.swing.JTextPane infoCalibrar;
+    private javax.swing.JTextPane infoCalibrate;
+    private javax.swing.JTextPane infoStart;
+    private javax.swing.JMenuItem itemExit;
+    private javax.swing.JMenuItem itemLaunchAgain;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JLabel labelButtonToPress;
     private javax.swing.JLabel labelCoord;
     private javax.swing.JLabel labelCoordInfo;
