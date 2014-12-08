@@ -1,9 +1,9 @@
-﻿JAutoClicker v0.8
+﻿JAutoClicker v0.9
 ============
 
 
 Release notes 08/12/2014
-v.08
+v.09
 ====
 - Added JNativeHook (native libraries) to stop clicking pressing Escape.
 - Solved minor bugs.
