@@ -1,4 +1,4 @@
-﻿JAutoClicker v0.4
+﻿JAutoClicker v0.8
 ============
 
 
