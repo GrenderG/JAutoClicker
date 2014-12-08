@@ -1,5 +1,14 @@
-JAutoClicker v0.2
+JAutoClicker v0.3
 ============
+
+Release notes 07/12/2014
+
+v0.3
+====
+
+- Added sound, added left button, wheel button and right button.
+- Solved minor bugs.
+- Added timer.
 
 Release notes 05/12/2014
 
