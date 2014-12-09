@@ -8,6 +8,7 @@ package jautoclicker.visual;
 import jautoclicker.logic.MouseLogic;
 import jautoclicker.logic.StopListener;
 import jautoclicker.logic.Timer;
+import jautoclicker.logic.TitleActualizer;
 import java.applet.Applet;
 import java.applet.AudioClip;
 import java.awt.MouseInfo;
@@ -30,6 +31,7 @@ public class Main extends javax.swing.JFrame {
     private double coords[] = new double[]{0.0, 0.0};
     private MouseLogic ml;
     private Timer timer;
+    private TitleActualizer ta;
     private static final ImageIcon icon = new ImageIcon(Main.class.getResource("/res/icon.png"));
     
     private final URL soundPath[] = new URL[]{Main.class.getResource("/sounds/1.wav"), 
@@ -292,17 +294,21 @@ public class Main extends javax.swing.JFrame {
                         break;
                 }
                 
-                timer = new Timer(Main.this);
+                timer = new Timer();
                 Thread tTimer = new Thread(timer);
                 
                 ml = new MouseLogic(Main.this.coords, whichButton, delay, timeMax, maxClicks, isDelayed, isInfinite, haveMaxClicks, Main.this, Main.this.timer);
                 GlobalScreen.getInstance().addNativeKeyListener(new StopListener(ml));
                 Thread clicker = new Thread(ml);
                 
+                ta = new TitleActualizer(Main.this, ml, timer);
+                Thread tActualizer = new Thread(ta);
+                
                 Main.this.setCalibrateEnabled(false);
                 Main.this.setStartEnabled(false);
                 tTimer.start();
                 clicker.start();
+                tActualizer.start();
                 
             }
 
@@ -316,6 +322,10 @@ public class Main extends javax.swing.JFrame {
     
     public Timer getTimer(){
         return this.timer;
+    }
+    
+    public TitleActualizer getTitleActualizer(){
+        return this.ta;
     }
     
     public void setCalibrateEnabled(boolean isEnabled){
@@ -335,7 +345,7 @@ public class Main extends javax.swing.JFrame {
     }
     
     public void showFinishDialog(){
-        JOptionPane.showMessageDialog(null, "La operación ha terminado.", "JAutoClicker", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(null, "Task finished.", "JAutoClicker", JOptionPane.INFORMATION_MESSAGE);
     }
     
     public void setCoordsText() {

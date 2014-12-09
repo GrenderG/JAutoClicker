@@ -15,11 +15,6 @@ public class Timer implements Runnable {
     
     private long time = 0;
     private boolean shouldStop = false;
-    private Main context;
-    
-    public Timer (Main context){
-        this.context = context;
-    }
     
     @Override
     public void run() {

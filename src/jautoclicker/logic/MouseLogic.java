@@ -71,7 +71,6 @@ public class MouseLogic implements Runnable {
                 try {
                     startClicking();
                     clickCount++;
-                    this.setTitleTimer();
                     if (isDelayed) {
                         Thread.sleep(delay);
                         actualTime += delay;
@@ -88,7 +87,6 @@ public class MouseLogic implements Runnable {
             while (true && !escapePressed) {
                 startClicking();
                 clickCount++;
-                this.setTitleTimer();
             }
 
         } else if (isInfinite && isDelayed && !haveMaxClicks) {
@@ -96,7 +94,6 @@ public class MouseLogic implements Runnable {
                 try {
                     startClicking();
                     clickCount++;
-                    this.setTitleTimer();
                     Thread.sleep(delay);
                     actualTime += delay;
                 } catch (InterruptedException ex) {
@@ -110,7 +107,6 @@ public class MouseLogic implements Runnable {
                 try {
                     startClicking();
                     clickCount++;
-                    this.setTitleTimer();
                     if (isDelayed) {
                         Thread.sleep(delay);
                     }
@@ -124,7 +120,6 @@ public class MouseLogic implements Runnable {
             while (true && !escapePressed) {
                 startClicking();
                 clickCount++;
-                this.setTitleTimer();
                 if (clickCount == maxClicks) {
                     break;
                 }
@@ -137,7 +132,6 @@ public class MouseLogic implements Runnable {
                     clickCount++;
                     Thread.sleep(delay);
                     actualTime += delay;
-                    this.setTitleTimer();
                     if (clickCount == maxClicks) {
                         break;
                     }
@@ -150,6 +144,7 @@ public class MouseLogic implements Runnable {
         context.getTimer().stopTimer();
         context.setCalibrateEnabled(true);
         context.setStartEnabled(true);
+        context.getTitleActualizer().setShouldStop(true);
         context.showFinishDialog();
         
     }
@@ -165,10 +160,6 @@ public class MouseLogic implements Runnable {
     public void setCoords(double[] coords){
         this.coords[0] = coords[0];
         this.coords[1] = coords[1];
-    }
-    
-    public void setTitleTimer(){
-        context.setTitle("JAutoClicker | Clicks: "+getClickCount()+" | ~"+timer.getTime()+" s");
     }
     
     public void startClicking() {
